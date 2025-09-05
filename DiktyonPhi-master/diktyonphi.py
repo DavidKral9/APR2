@@ -303,12 +303,6 @@ class Graph:
         return total_out_degree == total_in_degree
 
     def LineGraph(self) -> graph:
-        """
-        Vrátí hranový graf (Line Graph) pro zadaný neorientovaný graf g.
-
-        - Uzly nového grafu odpovídají hranám původního grafu (např. (u,v) s u<v).
-        - Dvě nové uzly jsou propojeny, pokud jejich původní hrany sdílejí vrchol.
-        """
         if self.type.name != "UNDIRECTED":
             raise ValueError("LineGraph očekává neorientovaný graf")
 
