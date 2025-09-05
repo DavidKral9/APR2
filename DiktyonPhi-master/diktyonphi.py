@@ -2,6 +2,8 @@ import enum
 import subprocess
 from typing import Dict, Hashable, Any, Optional, Iterator, Tuple
 
+from asyncio import graph
+
 
 class GraphType(enum.Enum):
     """Graph orientation type: directed or undirected."""
@@ -299,7 +301,42 @@ class Graph:
         print(f"počet z:{total_out_degree}")
         
         return total_out_degree == total_in_degree
-#    def projit_hrany(g):
+
+    def LineGraph(self) -> graph:
+        """
+        Vrátí hranový graf (Line Graph) pro zadaný neorientovaný graf g.
+
+        - Uzly nového grafu odpovídají hranám původního grafu (např. (u,v) s u<v).
+        - Dvě nové uzly jsou propojeny, pokud jejich původní hrany sdílejí vrchol.
+        """
+        if self.type.name != "UNDIRECTED":
+            raise ValueError("LineGraph očekává neorientovaný graf")
+
+        lg = Graph(GraphType.UNDIRECTED)
+        edges = []
+
+        # 1) Uzly nového grafu = hrany původního
+        for u in self.node_ids():
+            for v in self.node(u).neighbor_ids():
+                if u < v:   # abychom každou hranu přidali jen jednou
+                    edge_node = (u, v)
+                    edges.append(edge_node)
+                    lg.add_node(edge_node)
+
+        # 2) Spojování uzlů v LG: pokud hrany sdílejí vrchol
+        for i in range(len(edges)):
+            (a1, b1) = edges[i]
+            for j in range(i+1, len(edges)):
+                (a2, b2) = edges[j]
+                # pokud sdílí aspoň 1 vrchol, spojíme
+                if len({a1, b1, a2, b2}) <= 3:
+                    lg.add_edge(edges[i], edges[j])
+
+        return lg
+# 
+# 
+# 
+#  def projit_hrany(g):
 #        for u in g.node_ids():
 #            for v in g.node(u).neighbor_ids:
 #                print(f"hrana {u} -> {v}")
